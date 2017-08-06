@@ -15,7 +15,6 @@ extern int list_errno;
 #define ELEMENT_INVALID_ERROR 4 //error due to a NULL element
 
 typedef void *list_elm_pt;
-
 typedef struct list_node list_node_t;
 typedef list_node_t *list_node_pt;
 
@@ -28,55 +27,78 @@ typedef void element_print_func(list_elm_pt);
 typedef struct list list_t; // list_t is a struct containing at least a head pointer to the start of the list; 
 typedef list_t *list_pt;
 
+/*
+ **  Creates (memory allocation!) and initializes the list and prepares it for usage
+ **  Return a pointer to the newly created list
+ **  Returns NULL if list creation failed and list_errno is set to LIST_MEMORY_ERROR
+ */
 list_pt mylist_create(element_copy_func *element_copy, element_free_func *element_free, element_compare_func *element_compare, element_print_func *element_print);
-// Returns a pointer to a newly-allocated list.
-// Returns NULL if memory allocation failed and list_errno is set to LIST_MEMORY_ERROR 
 
+/*
+ **  Every list node and node element of the list needs to be deleted (free memory)
+ **  The list itself also needs to be deleted (free all memory) and set to NULL
+ */
 void mylist_free( list_pt* list );
-// Every list node and node element of the list needs to be deleted (free memory)
-// The list itself also needs to be deleted (free all memory) and set to NULL
 
+/*
+ **  Returns the number of elements in 'list'.
+ **  Returns -1 if error
+ */
 int mylist_size( list_pt list );
-// Returns the number of elements in 'list'.
 
+/*
+** Inserts a new list node containing 'element' in 'list' at position 'index'  and returns a pointer to the new list.
+** Remark: the first list node has index 0.
+** If 'index' is 0 or negative, the list node is inserted at the start of 'list'.
+** If 'index' is bigger than the number of elements in 'list', the list node is inserted at the end of 'list'.
+** Returns NULL if memory allocation failed and list_errno is set to LIST_MEMORY_ERROR
+ */
 list_pt mylist_insert_at_index( list_pt list, list_elm_pt element, int index);
-// Inserts a new list node containing 'element' in 'list' at position 'index'  and returns a pointer to the new list.
-// Remark: the first list node has index 0.
-// If 'index' is 0 or negative, the list node is inserted at the start of 'list'. 
-// If 'index' is bigger than the number of elements in 'list', the list node is inserted at the end of 'list'.
-// Returns NULL if memory allocation failed and list_errno is set to LIST_MEMORY_ERROR 
 
+/*
+ ** Removes the list node at index 'index' from 'list'. NO free() is called on the element pointer of the list node.
+ ** If 'index' is 0 or negative, the first list node is removed.
+ ** If 'index' is bigger than the number of elements in 'list', the last list node is removed.
+ ** If the list is empty, return list and list_errno is set to LIST_EMPTY_ERROR (to see the difference with removing the last element from a list)
+ */
 list_pt mylist_remove_at_index( list_pt list, int index);
-// Removes the list node at index 'index' from 'list'. NO free() is called on the element pointer of the list node. 
-// If 'index' is 0 or negative, the first list node is removed. 
-// If 'index' is bigger than the number of elements in 'list', the last list node is removed.
-// If the list is empty, return list and list_errno is set to LIST_EMPTY_ERROR (to see the difference with removing the last element from a list)
 
+/*
+** Deletes the list node at index 'index' in 'list'.
+** A free() is called on the element pointer of the list node to free any dynamic memory allocated to the element pointer.
+** If 'index' is 0 or negative, the first list node is deleted.
+** If 'index' is bigger than the number of elements in 'list', the last list node is deleted.
+** If the list is empty, return list and list_errno is set to LIST_EMPTY_ERROR (to see the difference with freeing the last element from a list)
+ */
 list_pt mylist_free_at_index( list_pt list, int index);
-// Deletes the list node at index 'index' in 'list'. 
-// A free() is called on the element pointer of the list node to free any dynamic memory allocated to the element pointer. 
-// If 'index' is 0 or negative, the first list node is deleted. 
-// If 'index' is bigger than the number of elements in 'list', the last list node is deleted.
-// If the list is empty, return list and list_errno is set to LIST_EMPTY_ERROR (to see the difference with freeing the last element from a list)
 
+/*
+** Returns a reference to the list node with index 'index' in 'list'.
+** If 'index' is 0 or negative, a reference to the first list node is returned.
+** If 'index' is bigger than the number of list nodes in 'list', a reference to the last list node is returned.
+** If the list is empty, NULL is returned.
+*/
 list_node_pt mylist_get_reference_at_index( list_pt list, int index );
-// Returns a reference to the list node with index 'index' in 'list'. 
-// If 'index' is 0 or negative, a reference to the first list node is returned. 
-// If 'index' is bigger than the number of list nodes in 'list', a reference to the last list node is returned. 
-// If the list is empty, NULL is returned.
 
+/*
+** Returns the list element contained in the list node with index 'index' in 'list'.
+** If 'index' is 0 or negative, the element of the first list node is returned.
+** If 'index' is bigger than the number of elements in 'list', the element of the last list node is returned.
+** If the list is empty, NULL is returned.
+*/
 list_elm_pt mylist_get_element_at_index( list_pt list, int index );
-// Returns the list element contained in the list node with index 'index' in 'list'. 
-// If 'index' is 0 or negative, the element of the first list node is returned. 
-// If 'index' is bigger than the number of elements in 'list', the element of the last list node is returned.
-// If the list is empty, NULL is returned.
 
+/*
+** Returns an index to the first list node in 'list' containing 'element'.
+** If 'element' is not found in 'list', -1 is returned.
+*/
 int mylist_get_index_of_element( list_pt list, list_elm_pt element );
-// Returns an index to the first list node in 'list' containing 'element'.  
-// If 'element' is not found in 'list', -1 is returned.
 
+/*
+** for testing purposes: print the entire list on screen
+*/
 void mylist_print( list_pt list );
-// for testing purposes: print the entire list on screen
+
 
 #ifdef LIST_EXTRA
   list_pt list_insert_at_reference( list_pt list, list_elm_pt element, list_node_pt reference );
