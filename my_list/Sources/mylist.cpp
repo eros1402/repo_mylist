@@ -6,9 +6,7 @@
  Copyright   : Copyright from Chi Pham Hoang
  Description : Implementation of a double-linked pointer list
  	 	 	   Dynamic memory
- Note 	     : 1) User can define QUEUE_SIZE to set the maximum
-	 	 	   size of the queue.
-			   2) User must implement 3 void functions to work with this API:
+ Note 	     : User must implement 3 void functions to work with this API:
 			   - A copy function : to read out an element in the list
 			   - A free function : to free(delete) an element in the list
 			   - A compare function; to compare 2 elements in the list
@@ -60,16 +58,22 @@ void mem_alloc_check(void *p, char *msg) {
 /*
  * Public functions
  */ 
+
+/*
+ **  Creates (memory allocation!) and initializes the list and prepares it for usage
+ **  Return a pointer to the newly created list
+ **  Returns NULL if list creation failed and list_errno is set to LIST_MEMORY_ERROR
+ */
 list_pt mylist_create(element_copy_func *element_copy, element_free_func *element_free, element_compare_func *element_compare, element_print_func *element_print){
 	list_pt mylist=NULL;	
 	list_errno = LIST_NO_ERROR;
 	mylist = (list_pt) malloc(sizeof(list_t)); // list allocated
 	if(mylist == NULL)
 	{
-		DEBUG_PRINT( "DEBUG:: Error in list allocating\n" );
+		DEBUG_PRINT( "Error mylist_create(): memory allocation error\n" );
 		list_errno = LIST_MEMORY_ERROR;
 		return NULL;
-	}	
+	}
 	mylist->head = NULL;
 	mylist->num_of_element = 0;
 	mylist->element_copy = element_copy;
@@ -78,9 +82,11 @@ list_pt mylist_create(element_copy_func *element_copy, element_free_func *elemen
 	mylist->element_print = element_print;
 	return mylist;
 } 
-// Returns a pointer to a newly-allocated list.
-// Returns NULL if memory allocation failed and list_errno is set to LIST_MEMORY_ERROR 
 
+/*
+ **  Every list node and node element of the list needs to be deleted (free memory)
+ **  The list itself also needs to be deleted (free all memory) and set to NULL
+ */
 void mylist_free( list_pt* list )
 {	
 	int i=0;
@@ -119,9 +125,10 @@ void mylist_free( list_pt* list )
 	free(*list);
 	*list = NULL;
 }
-// Every list node and node element of the list needs to be deleted (free memory)
-// The list itself also needs to be deleted (free all memory) and set to NULL
 
+/*
+ **  Returns the number of elements in 'list'.
+ */
 int mylist_size( list_pt list )
 {	
 	list_errno = LIST_NO_ERROR;
@@ -134,8 +141,14 @@ int mylist_size( list_pt list )
 	}		
 	return list->num_of_element;
 }
-// Returns the number of elements in 'list'.
 
+/*
+** Inserts a new list node containing 'element' in 'list' at position 'index'  and returns a pointer to the new list.
+** Remark: the first list node has index 0.
+** If 'index' is 0 or negative, the list node is inserted at the start of 'list'.
+** If 'index' is bigger than the number of elements in 'list', the list node is inserted at the end of 'list'.
+** Returns NULL if memory allocation failed and list_errno is set to LIST_MEMORY_ERROR
+ */
 list_pt mylist_insert_at_index( list_pt list, list_elm_pt element, int index)
 {	
 	list_node_pt new_node;
@@ -145,14 +158,14 @@ list_pt mylist_insert_at_index( list_pt list, list_elm_pt element, int index)
 	//check if the list is NULL
 	if(list == NULL) 
 	{
-		DEBUG_PRINT( "DEBUG:: List invalid error\n" );
+		DEBUG_PRINT( "Error mylist_insert_at_index(): List invalid error\n" );
 		list_errno = LIST_INVALID_ERROR;
         return NULL;	
 	}		
 	new_node = (list_node_pt)malloc(sizeof(list_node_t));
 	if(new_node == NULL)
 	{
-		DEBUG_PRINT( "DEBUG:: Error in allocating a new list_node\n" );
+		DEBUG_PRINT( "Error mylist_insert_at_index(): Error in allocating a new list_node\n" );
 		list_errno = LIST_MEMORY_ERROR;
 		return NULL;
 	}		
@@ -205,12 +218,13 @@ list_pt mylist_insert_at_index( list_pt list, list_elm_pt element, int index)
 	list->num_of_element++;
 	return list;
 }
-// Inserts a new list node containing 'element' in 'list' at position 'index'  and returns a pointer to the new list.
-// Remark: the first list node has index 0.
-// If 'index' is 0 or negative, the list node is inserted at the start of 'list'. 
-// If 'index' is bigger than the number of elements in 'list', the list node is inserted at the end of 'list'.
-// Returns NULL if memory allocation failed and list_errno is set to LIST_MEMORY_ERROR 
 
+/*
+ ** Removes the list node at index 'index' from 'list'. NO free() is called on the element pointer of the list node.
+ ** If 'index' is 0 or negative, the first list node is removed.
+ ** If 'index' is bigger than the number of elements in 'list', the last list node is removed.
+ ** If the list is empty, return list and list_errno is set to LIST_EMPTY_ERROR (to see the difference with removing the last element from a list)
+ */
 list_pt mylist_remove_at_index( list_pt list, int index)
 {		
 	list_node_pt temp;
@@ -260,11 +274,14 @@ list_pt mylist_remove_at_index( list_pt list, int index)
 	list->num_of_element--;
 	return list;
 }
-// Removes the list node at index 'index' from 'list'. NO free() is called on the element pointer of the list node. 
-// If 'index' is 0 or negative, the first list node is removed. 
-// If 'index' is bigger than the number of elements in 'list', the last list node is removed.
-// If the list is empty, return list and list_errno is set to LIST_EMPTY_ERROR (to see the difference with removing the last element from a list)
 
+/*
+** Deletes the list node at index 'index' in 'list'.
+** A free() is called on the element pointer of the list node to free any dynamic memory allocated to the element pointer.
+** If 'index' is 0 or negative, the first list node is deleted.
+** If 'index' is bigger than the number of elements in 'list', the last list node is deleted.
+** If the list is empty, return list and list_errno is set to LIST_EMPTY_ERROR (to see the difference with freeing the last element from a list)
+ */
 list_pt mylist_free_at_index( list_pt list, int index)
 {	
 	
@@ -274,7 +291,7 @@ list_pt mylist_free_at_index( list_pt list, int index)
 	//check if the list is NULL
 	if(list == NULL) 
 	{
-		DEBUG_PRINT( "DEBUG:: List invalid error\n" );
+		DEBUG_PRINT( "Error mylist_free_at_index():: List invalid error\n" );
 		list_errno = LIST_INVALID_ERROR;
         return NULL;	
 	}	
@@ -282,7 +299,7 @@ list_pt mylist_free_at_index( list_pt list, int index)
 	if(list->num_of_element == 0)
 	{	  
 	  list_errno = LIST_EMPTY_ERROR;
-	  DEBUG_PRINT( "DEBUG:: List is empty\n" );
+	  DEBUG_PRINT( "Warning mylist_free_at_index(): List is empty\n" );
 	  return list;
 	}	
 	//Check if index is negative or out of list range
@@ -321,12 +338,13 @@ list_pt mylist_free_at_index( list_pt list, int index)
 	list->num_of_element--;
 	return list;
 }
-// Deletes the list node at index 'index' in 'list'. 
-// A free() is called on the element pointer of the list node to free any dynamic memory allocated to the element pointer. 
-// If 'index' is 0 or negative, the first list node is deleted. 
-// If 'index' is bigger than the number of elements in 'list', the last list node is deleted.
-// If the list is empty, return list and list_errno is set to LIST_EMPTY_ERROR (to see the difference with freeing the last element from a list)
 
+/*
+** Returns a reference to the list node with index 'index' in 'list'.
+** If 'index' is 0 or negative, a reference to the first list node is returned.
+** If 'index' is bigger than the number of list nodes in 'list', a reference to the last list node is returned.
+** If the list is empty, NULL is returned.
+*/
 list_node_pt mylist_get_reference_at_index( list_pt list, int index )
 {	
 	int i;
@@ -336,7 +354,7 @@ list_node_pt mylist_get_reference_at_index( list_pt list, int index )
 	//check if the list is NULL
 	if(list == NULL) 
 	{
-		DEBUG_PRINT( "DEBUG:: List invalid error\n" );
+		DEBUG_PRINT( "Error mylist_get_reference_at_index(): List invalid error\n" );
 		list_errno = LIST_INVALID_ERROR;
         return NULL;	
 	}	
@@ -344,7 +362,7 @@ list_node_pt mylist_get_reference_at_index( list_pt list, int index )
 	if(list->num_of_element == 0)
 	{
 	  list_errno = LIST_EMPTY_ERROR;
-	  DEBUG_PRINT( "DEBUG:: List is empty\n" );
+	  DEBUG_PRINT( "Warning mylist_get_reference_at_index(): List is empty\n" );
 	  return NULL;
 	}	
 	//Check if index is negative or out of list range
@@ -357,11 +375,13 @@ list_node_pt mylist_get_reference_at_index( list_pt list, int index )
 	}		
 	return node_ptr;
 }
-// Returns a reference to the list node with index 'index' in 'list'. 
-// If 'index' is 0 or negative, a reference to the first list node is returned. 
-// If 'index' is bigger than the number of list nodes in 'list', a reference to the last list node is returned. 
-// If the list is empty, NULL is returned.
 
+/*
+** Returns the list element contained in the list node with index 'index' in 'list'.
+** If 'index' is 0 or negative, the element of the first list node is returned.
+** If 'index' is bigger than the number of elements in 'list', the element of the last list node is returned.
+** If the list is empty, NULL is returned.
+*/
 list_elm_pt mylist_get_element_at_index( list_pt list, int index )
 {	
 	list_errno = LIST_NO_ERROR;	
@@ -369,18 +389,16 @@ list_elm_pt mylist_get_element_at_index( list_pt list, int index )
 	if(temp == NULL) return NULL;	
 	return temp->element; //return an element pointer of the list (not a copy)-> be careful!!!
 }
-// Returns the list element contained in the list node with index 'index' in 'list'. 
-// If 'index' is 0 or negative, the element of the first list node is returned. 
-// If 'index' is bigger than the number of elements in 'list', the element of the last list node is returned.
-// If the list is empty, NULL is returned.
 
+// Returns an index to the first list node in 'list' containing 'element'.
+// If 'element' is not found in 'list', -1 is returned.
 int mylist_get_index_of_element( list_pt list, list_elm_pt element )
 {		
 	list_errno = LIST_NO_ERROR;
 	//check if the list is NULL
 	if(list == NULL) 
 	{
-		DEBUG_PRINT( "DEBUG:: List invalid error\n" );
+		DEBUG_PRINT( "Error mylist_get_index_of_element(): List invalid error\n" );
 		list_errno = LIST_INVALID_ERROR;
         return -1;	
 	}	
@@ -388,14 +406,14 @@ int mylist_get_index_of_element( list_pt list, list_elm_pt element )
 	if(list->num_of_element == 0)
 	{	  
 		list_errno = LIST_EMPTY_ERROR;
-		DEBUG_PRINT( "DEBUG:: List is empty\n" );
+		DEBUG_PRINT( "Warning mylist_get_index_of_element(): List is empty\n" );
 		return -1;
 	}	
 	//Check the element is NULL
 	if(element == NULL)
 	{
 		list_errno = ELEMENT_INVALID_ERROR;
-		DEBUG_PRINT( "DEBUG:: Input element is NULL\n" );
+		DEBUG_PRINT( "Warning mylist_get_index_of_element(): Input element is NULL\n" );
 		return -1;
 	}	
 	int i=0;
@@ -411,9 +429,10 @@ int mylist_get_index_of_element( list_pt list, list_elm_pt element )
 	// If 'element' is not found in 'list'
 	return -1;
 }
-// Returns an index to the first list node in 'list' containing 'element'.  
-// If 'element' is not found in 'list', -1 is returned.
 
+/*
+** for testing purposes: print the entire list on screen
+*/
 void mylist_print( list_pt list )
 {	
 	int i;
@@ -423,7 +442,7 @@ void mylist_print( list_pt list )
 	//check if the list is NULL
 	if(list == NULL) 
 	{
-		DEBUG_PRINT( "DEBUG:: List invalid error\n" );
+		DEBUG_PRINT( "Error mylist_print(): List invalid error\n" );
 		list_errno = LIST_INVALID_ERROR;
         return;	
 	}	
@@ -432,7 +451,7 @@ void mylist_print( list_pt list )
 	{
 	  //List is empty
 	  list_errno = LIST_EMPTY_ERROR;
-	  DEBUG_PRINT( "DEBUG:: List is empty\n" );
+	  DEBUG_PRINT( "Warning mylist_print(): List is empty\n" );
 	  return;
 	}	
 	temp = list->head;
@@ -442,7 +461,7 @@ void mylist_print( list_pt list )
 		temp = temp->next;
 	}
 }
-// for testing purposes: print the entire list on screen
+
 
 #ifdef LIST_EXTRA
   list_pt list_insert_at_reference( list_pt list, list_elm_pt element, list_node_pt reference )
@@ -469,7 +488,7 @@ void mylist_print( list_pt list )
 	  list = mylist_insert_at_index(list, element, index);
 	  
 	  // Sort the list
-	  //~ for(i = 0; i < list->num_of_element-1; i++)
+	  //~ for(i = 0; i < list->num_of_element-1; i++)DEBUG
 	  //~ {
 		  //~ for(j = i+1; j < list->num_of_element; j++)
 		  //~ {
