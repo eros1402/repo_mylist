@@ -1,3 +1,20 @@
+/*
+ ============================================================================
+ Name        : mylist.h
+ Author      : cph
+ Version     : 2.0
+ Copyright   : Copyright from Chi Pham Hoang
+ Description : Implementation of a double-linked pointer list
+ 	 	 	   Dynamic memory
+ Note 	     : 1) User must declare a global int var "list_errno" (error number)
+ 	 	 	   2) User must implement 3 void functions to work with this API:
+			   - A copy function : to read out an element in the list
+			   - A free function : to free(delete) an element in the list
+			   - A compare function; to compare 2 elements in the list
+			   - A print function: to print out an element to stdout
+ ============================================================================
+ */
+
 #ifndef MYLIST_H_
 #define MYLIST_H_
 
@@ -59,7 +76,7 @@ list_pt mylist_insert_at_index( list_pt list, list_elm_pt element, int index);
  ** Removes the list node at index 'index' from 'list'. NO free() is called on the element pointer of the list node.
  ** If 'index' is 0 or negative, the first list node is removed.
  ** If 'index' is bigger than the number of elements in 'list', the last list node is removed.
- ** If the list is empty, return list and list_errno is set to LIST_EMPTY_ERROR (to see the difference with removing the last element from a list)
+ ** Iflist_errno the list is empty, return list and list_errno is set to LIST_EMPTY_ERROR (to see the difference with removing the last element from a list)
  */
 list_pt mylist_remove_at_index( list_pt list, int index);
 

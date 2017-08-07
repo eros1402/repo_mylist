@@ -1,12 +1,13 @@
 /*
  ============================================================================
- Name        : mylist.cpp
+ Name        : mylist.h
  Author      : cph
- Version     : 2.1
+ Version     : 2.0
  Copyright   : Copyright from Chi Pham Hoang
  Description : Implementation of a double-linked pointer list
  	 	 	   Dynamic memory
- Note 	     : User must implement 3 void functions to work with this API:
+ Note 	     : 1) User must declare a global int var "list_errno" (error number)
+ 	 	 	   2) User must implement 3 void functions to work with this API:
 			   - A copy function : to read out an element in the list
 			   - A free function : to free(delete) an element in the list
 			   - A compare function; to compare 2 elements in the list
@@ -19,16 +20,12 @@
 //#include <assert.h>
 #include "mylist.h"
 
-#ifdef DEBUG
-	#define DEBUG_PRINT(...) 															\
-	  do {					  															\
-		printf("In %s - function %s at line %d: ", __FILE__, __func__, __LINE__);		\
-		printf(__VA_ARGS__);															\
-	  } while(0)
-#else
-	#define DEBUG_PRINT(...) (void)0
-#endif
 
+#define DEBUG_PRINT(...) 															\
+  do {					  															\
+	printf("In %s - function %s at line %d: ", __FILE__, __func__, __LINE__);		\
+	printf(__VA_ARGS__);															\
+  } while(0)
 
 /*
  * The real definition of 'struct list'
@@ -96,7 +93,7 @@ void mylist_free( list_pt* list )
 	//check if the list is NULL
 	if(*list == NULL) 
 	{
-		DEBUG_PRINT( "DEBUG:: List invalid error\n" );
+		DEBUG_PRINT( "Error mylist_free(): List invalid error\n" );
 		list_errno = LIST_INVALID_ERROR;
         return;	
 	}	
@@ -128,6 +125,7 @@ void mylist_free( list_pt* list )
 
 /*
  **  Returns the number of elements in 'list'.
+ **  Returns -1 if error
  */
 int mylist_size( list_pt list )
 {	
@@ -135,7 +133,7 @@ int mylist_size( list_pt list )
 	//check if the list is NULL
 	if(list == NULL) 
 	{
-		DEBUG_PRINT( "DEBUG::List invalid error\n" );
+		DEBUG_PRINT( "Error mylist_size():List invalid error\n" );
 		list_errno = LIST_INVALID_ERROR;
         return -1;	
 	}		
@@ -390,8 +388,10 @@ list_elm_pt mylist_get_element_at_index( list_pt list, int index )
 	return temp->element; //return an element pointer of the list (not a copy)-> be careful!!!
 }
 
-// Returns an index to the first list node in 'list' containing 'element'.
-// If 'element' is not found in 'list', -1 is returned.
+/*
+** Returns an index to the first list node in 'list' containing 'element'.
+** If 'element' is not found in 'list', -1 is returned.
+*/
 int mylist_get_index_of_element( list_pt list, list_elm_pt element )
 {		
 	list_errno = LIST_NO_ERROR;
@@ -488,7 +488,7 @@ void mylist_print( list_pt list )
 	  list = mylist_insert_at_index(list, element, index);
 	  
 	  // Sort the list
-	  //~ for(i = 0; i < list->num_of_element-1; i++)DEBUG
+	  //~ for(i = 0; i < list->num_of_element-1; i++)
 	  //~ {
 		  //~ for(j = i+1; j < list->num_of_element; j++)
 		  //~ {

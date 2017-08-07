@@ -37,9 +37,9 @@ int main( void )
   int* e = (int *)malloc(sizeof(int));
   *e = 2;
 
-//  list_insert_at_index(NULL,a,0);
-//  printf("size: %d\n", list_size(list));
-//
+  mylist_insert_at_index(NULL,a,0);
+  printf("size: %d\n", mylist_size(list));
+
 //  list = list_create( &element_copy, &element_free, &element_compare, &element_print);
 //  printf("size: %d\n", list_size(list));
 //  list_print(list);
